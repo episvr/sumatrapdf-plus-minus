@@ -962,7 +962,7 @@ static const int gSettingsReadAloudControls[] = {IDC_GROUP_RA_VOICE,
 static const int gSettingsOcrControls[] = {IDC_GROUP_OCR,      IDC_AUTO_OCR,         IDC_OCR_DESCRIPTION,
                                            IDC_OCR_AUTO_SAVE,  IDC_OCR_SAVE_WARNING, IDC_GROUP_SMART_TOC,
                                            IDC_TOC_MODE_LABEL, IDC_TOC_MODE,         IDC_TOC_MODE_DESCRIPTION};
-static const int gSettingsAiControls[] = {IDC_GROUP_INLINE_TRANSLATE,
+static const int gSettingsTranslateControls[] = {IDC_GROUP_INLINE_TRANSLATE,
                                           IDC_ENABLE_INLINE_TRANSLATE,
                                           IDC_TRANSLATE_TARGET_LABEL,
                                           IDC_TRANSLATE_TARGET,
@@ -1074,7 +1074,7 @@ static void FitSettingsReadAloudLabels(HWND hDlg) {
 }
 
 // Align translate page label/field columns after translation (Chinese labels are wider).
-static void FitSettingsAiLabels(HWND hDlg) {
+static void FitSettingsTranslateLabels(HWND hDlg) {
     static const int labelIds[] = {
         IDC_TRANSLATE_TARGET_LABEL, IDC_TRANSLATE_VOLC_AK_LABEL, IDC_TRANSLATE_VOLC_SK_LABEL,
     };
@@ -1464,7 +1464,7 @@ static void ShowSettingsPage(HWND hDlg, int page) {
                  {gSettingsReadingControls, dimof(gSettingsReadingControls)},
                  {gSettingsReadAloudControls, dimof(gSettingsReadAloudControls)},
                  {gSettingsOcrControls, dimof(gSettingsOcrControls)},
-                 {gSettingsAiControls, dimof(gSettingsAiControls)},
+                 {gSettingsTranslateControls, dimof(gSettingsTranslateControls)},
                  {gSettingsAdvancedControls, dimof(gSettingsAdvancedControls)}};
     page = limitValue(page, 0, dimof(pages) - 1);
     auto* prefs = (GlobalPrefs*)GetWindowLongPtr(hDlg, GWLP_USERDATA);
@@ -2208,7 +2208,7 @@ static INT_PTR CALLBACK Dialog_Settings_Proc(HWND hDlg, UINT msg, WPARAM wp, LPA
             FitSettingsReadingLabels(hDlg);
             FitSettingsReadAloudLabels(hDlg);
             FitSettingsOcrLabels(hDlg);
-            FitSettingsAiLabels(hDlg);
+            FitSettingsTranslateLabels(hDlg);
             // Closed ComboBox height is CB_SETITEMHEIGHT(-1), not the window rect.
             {
                 HWND heightRef = GetDlgItem(hDlg, IDC_DEFAULT_LAYOUT);
