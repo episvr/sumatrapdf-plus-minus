@@ -687,7 +687,9 @@ static Rect MonitorWorkArea(HWND hwnd) {
 
 static void SyncEditScrollbar(HWND edit, int contentH, int visibleH) {
     // Repeated hide/show calls recalculate the non-client area while text streams in.
-    if (GetWindowLongPtrW(edit, GWL_STYLE) & ES_DISABLENOSCROLL) {
+    // ES_DISABLENOSCROLL was removed from the Windows SDK (it collided with ES_NUMBER).
+    constexpr LONG kEditDisableNoScroll = 0x2000;
+    if (GetWindowLongPtrW(edit, GWL_STYLE) & kEditDisableNoScroll) {
         return;
     }
     ShowScrollBar(edit, SB_VERT, contentH > visibleH);
