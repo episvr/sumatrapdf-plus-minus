@@ -34,11 +34,8 @@ struct WindowTab {
     // Keep page-count width stable across reflow reloads of this book.
     int toolbarPageDigits = 0;
     bool showTocPresentation = false;
-    // SidebarView: 0 bookmarks, 1 thumbnails, 2 favorites, 3 AI
+    // SidebarView: 0 bookmarks, 1 thumbnails, 2 favorites, 3 annotations
     int sidebarView = 0;
-    // Runtime Ask AI conversation for this tab. Owned by InlineTranslate.cpp.
-    // Not written to settings.
-    void* askAiState = nullptr;
     // an array of ids for ToC items that have been expanded/collapsed by user
     Vec<int> tocState;
     // canvas dimensions when the document was last visible

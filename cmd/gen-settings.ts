@@ -499,7 +499,7 @@ const annotations: Field[] = [
       "SelectionToolbar",
       Bool,
       true,
-      "if true, a small toolbar with annotation actions (highlight, underline etc.) and Ask AI pops up after selecting text in PDF documents that support annotations. Set to false to disable it",
+      "if true, a small toolbar with annotation actions (highlight, underline, translate etc.) pops up after selecting text in PDF documents that support annotations. Set to false to disable it",
     ),
     "3.7",
   ),
@@ -991,44 +991,6 @@ const globalPrefs: Field[] = [
       ),
     ),
     "Valid values: conservative, standard, detailed",
-  ),
-  setDoc(
-    setVersion(
-      mkField(
-        "AiChatProvider",
-        Str,
-        "doubao",
-        "Ask AI provider: doubao (豆包), deepseek, or chatgpt",
-      ),
-      "3.7",
-    ),
-    "Valid values: doubao, deepseek, chatgpt",
-  ),
-  mkField("AiTocApiBaseUrl", Str, "", "AI table of contents API base URL"),
-  mkField("AiTocApiKey", Str, "", "AI table of contents API key"),
-  mkField("AiTocApiModel", Str, "", "AI table of contents model"),
-  mkField("AiTocApiProfiles", Str, "", "saved AI table of contents API profiles (JSON)"),
-  mkField("AiChatApiProfile", Int, -1, "default chat API profile; -1 inherits the general AI API"),
-  mkField("AiChatModel", Str, "", "default chat model; empty inherits the selected API model"),
-  mkField("AiTocApiConcurrency", Int, 4, "maximum simultaneous AI table of contents requests (1-8)"),
-  mkField("AiTocBodyProvider", Str, "", "last chosen body TOC AI method: api/web; empty asks on first use"),
-  setVersion(
-    mkField(
-      "AiChatUseDeepSeekInsteadOfDoubao",
-      Bool,
-      false,
-      "deprecated: use AiChatProvider instead; if true and AiChatProvider is not in settings, migrates to deepseek",
-    ),
-    "3.7",
-  ),
-  setVersion(
-    mkField(
-      "EnableAskAI",
-      Bool,
-      true,
-      "if false, hide Ask AI (online chat) in the selection toolbar, context menu, and command palette",
-    ),
-    "3.7",
   ),
   setVersion(
     mkField(

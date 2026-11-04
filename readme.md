@@ -121,14 +121,7 @@ These are reading features; converted Office layouts may differ from the origina
 - **框选识别：** 按住 `Alt` 用鼠标拖选，或按 `Ctrl+Shift+X` 后拖选区域，识别文字复制到剪贴板。
   **Region OCR:** hold `Alt` and drag with the mouse, or press `Ctrl+Shift+X` and select a region; recognized text is copied to the clipboard.
 
-**AI 目录识别：** 支持多套 OpenAI 兼容 API 配置、模型筛选和请求并发设置，也可使用网页 AI 工作流程。可从印刷目录识别，或在没有独立目录页时从正文生成；导入前可校准目录。
-**AI table of contents:** use multiple OpenAI-compatible API profiles, model filtering and concurrency settings, or the web AI workflow. Recognize printed contents or generate an outline from body text, then review before importing.
-
-AI API 模式会向所配置的平台发送识别请求，与本地离线 OCR 不同。
-AI API mode sends recognition requests to your configured provider, separately from offline local OCR.
-
-[OCR 使用说明 / OCR guide](docs/md/OCR.md) · [AI 目录配置 / AI TOC setup](docs/ai-toc-api.md)
-
+[OCR 使用说明 / OCR guide](docs/md/OCR.md)
 ## 电子书阅读：选字体、改字号，不用折腾配置文件
 
 阅读 EPUB、MOBI 等可以重新排版的电子书，字体和字号会直接影响阅读体验。这也是 Plus 持续改进的一块。
@@ -159,8 +152,8 @@ Theme-matched colors apply to document content, including PDF text, scanned page
 
 - **四种主题：** Light-Warm、Light-White、Dark-Dracula、Dark-Black。文档颜色可保留原稿或匹配主题；菜单、侧栏、输入框和常用提示框随主题配色。
   **Four themes:** Light-Warm, Light-White, Dark-Dracula and Dark-Black. Preserve original document colors or match the theme; menus, sidebars, inputs and common dialogs follow the interface theme.
-- **批注：** PDF 划词工具栏支持高亮、下划线、删除线与 Ask AI；自由文本可直接在页面上输入、双击编辑，`Ctrl+Enter` 提交、`Esc` 取消。
-  **Annotations:** selection tools for highlights, underlines, strikeouts and Ask AI. Edit free text directly on the page; double-click to edit, `Ctrl+Enter` to commit, `Esc` to cancel.
+- **批注：** PDF 划词工具栏支持高亮、下划线、删除线与翻译；自由文本可直接在页面上输入、双击编辑，`Ctrl+Enter` 提交、`Esc` 取消。
+  **Annotations:** selection tools for highlights, underlines, strikeouts and translation. Edit free text directly on the page; double-click to edit, `Ctrl+Enter` to commit, `Esc` to cancel.
 - **离线查词：** 将词典放入 `dict`，启用查词后双击正文词语。高级设置 `OfflineDictionaryPath` 可指定其他目录；繁体 PDF 查词需 `opencc`。
   **Offline lookup:** place dictionaries in `dict`, enable lookup and double-click a word. Use `OfflineDictionaryPath` for another folder; Traditional Chinese PDF lookup needs `opencc`.
 - **朗读：** 工具栏喇叭可开始、暂停和继续；支持从页首、光标或选区开始。系统语音逐词高亮，EPUB 3 录音也使用同一控制条。

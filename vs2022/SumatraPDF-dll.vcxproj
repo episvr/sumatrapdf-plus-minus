@@ -1303,8 +1303,6 @@ cd ../out/rel64_prefast_asan &amp; ..\..\bin\MakeLZSA.exe InstallerData.dat libm
     <ClCompile Include="..\src\HomePage.cpp" />
     <ClCompile Include="..\src\HtmlFormatter.cpp" />
     <ClCompile Include="..\src\ImageSaveCropResize.cpp" />
-    <ClCompile Include="..\src\AiToc.cpp" />
-    <ClCompile Include="..\src\AiTocApi.cpp" />
     <ClCompile Include="..\src\Installer.cpp" />
     <ClCompile Include="..\src\InstallerCommon.cpp" />
     <ClCompile Include="..\src\LookupAudio.cpp" />
@@ -1407,8 +1405,6 @@ cd ../out/rel64_prefast_asan &amp; ..\..\bin\MakeLZSA.exe InstallerData.dat libm
     <ClCompile Include="..\src\ExtractBookToc.cpp" />
     <ClCompile Include="..\src\TocExtraction.cpp" />
     <ClCompile Include="..\src\TocCalib.cpp" />
-    <ClCompile Include="..\src\TocStructureScan.cpp" />
-    <ClCompile Include="..\src\TocAiPrompts.cpp" />
     <ClCompile Include="..\src\PrintedTocModel.cpp" />
     <ClCompile Include="..\src\PrintedTocPageDetector.cpp" />
     <ClCompile Include="..\src\PrintedTocReconstruct.cpp" />
@@ -1741,7 +1737,6 @@ cd ../out/rel64_prefast_asan &amp; ..\..\bin\MakeLZSA.exe InstallerData.dat libm
     <None Include="..\cmd\trans-add-placeholder.ts" />
     <None Include="..\cmd\trans-dl.ts" />
     <None Include="..\cmd\trans-gen.ts" />
-    <None Include="..\cmd\trans-with-ai.ts" />
     <None Include="..\cmd\trigger-codeql.ts" />
     <None Include="..\cmd\tsconfig.json" />
     <None Include="..\cmd\util.ts" />

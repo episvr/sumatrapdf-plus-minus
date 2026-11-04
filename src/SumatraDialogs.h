@@ -14,7 +14,7 @@ HWND CreateAppDialogModeless(int dlgId, HWND parent, DLGPROC dlgProc, LPARAM dat
 bool Dialog_ChangeScrollbar(HWND hwnd);
 // pages in the order of the category list
 constexpr int kSettingsPageReadAloud = 3;
-constexpr int kSettingsPageAi = 5;
+constexpr int kSettingsPageTranslate = 5;
 INT_PTR Dialog_Settings(HWND hwnd, GlobalPrefs* prefs, int initialPage = 0);
 bool Dialog_AddFavorite(HWND hwnd, const char* pageNo, AutoFreeStr& favName);
 bool Dialog_PdfTocTitle(HWND hwnd, const char* dialogTitle, const char* prompt, AutoFreeStr& title,
@@ -65,6 +65,3 @@ bool Dialog_ChangeBackgroundColor(HWND hwnd, COLORREF currentColor, bool isCheck
 bool Dialog_SetTabColor(HWND hwnd, COLORREF currentColor, bool isUnset, COLORREF& resultColor, bool& resultIsUnset);
 
 TempStr ZoomLevelStr(float zoom);
-
-// Reuse the searchable model picker for the conversation sidebar. Returned string is owned.
-char* PickAiModel(HWND owner, Vec<char*>& models, const char* current);

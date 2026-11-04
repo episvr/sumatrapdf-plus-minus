@@ -193,7 +193,7 @@ struct Annotations {
     // author at all. If not set will use Windows user name
     char* defaultAuthor;
     // if true, a small toolbar with annotation actions (highlight,
-    // underline etc.) and Ask AI pops up after selecting text in PDF
+    // underline, translate etc.) pops up after selecting text in PDF
     // documents that support annotations. Set to false to disable it
     bool selectionToolbar;
     // PDF font for new free text: Helv, Cour, or TiRo
@@ -583,30 +583,6 @@ struct GlobalPrefs {
     // smart bookmark extraction detail: conservative, standard, or
     // detailed
     char* extractPdfTocMode;
-    // Ask AI provider: doubao (豆包), deepseek, or chatgpt
-    char* aiChatProvider;
-    // AI table of contents API base URL
-    char* aiTocApiBaseUrl;
-    // AI table of contents API key
-    char* aiTocApiKey;
-    // AI table of contents model
-    char* aiTocApiModel;
-    // saved AI table of contents API profiles (JSON)
-    char* aiTocApiProfiles;
-    // default chat API profile; -1 inherits the general AI API
-    int aiChatApiProfile;
-    // default chat model; empty inherits the selected API model
-    char* aiChatModel;
-    // maximum simultaneous AI table of contents requests (1-8)
-    int aiTocApiConcurrency;
-    // last chosen body TOC AI method: api/web; empty asks on first use
-    char* aiTocBodyProvider;
-    // deprecated: use AiChatProvider instead; if true and AiChatProvider
-    // is not in settings, migrates to deepseek
-    bool aiChatUseDeepSeekInsteadOfDoubao;
-    // if false, hide Ask AI (online chat) in the selection toolbar,
-    // context menu, and command palette
-    bool enableAskAI;
     // if false, hide Translate in the selection toolbar, context menu, and
     // command palette
     bool enableInlineTranslate;
@@ -1190,18 +1166,6 @@ static const FieldInfo gGlobalPrefsFields[] = {
     {offsetof(GlobalPrefs, ocrCopyMerged), SettingType::Bool, true, nullptr},
     {offsetof(GlobalPrefs, extractPdfTocMode), SettingType::String, (intptr_t)"standard",
      "智能提取目录详细程度 conservative/standard/detailed"},
-    {offsetof(GlobalPrefs, aiChatProvider), SettingType::String, (intptr_t)"doubao",
-     "Ask AI 提供商 doubao/deepseek/chatgpt"},
-    {offsetof(GlobalPrefs, aiTocApiBaseUrl), SettingType::String, (intptr_t)"", nullptr},
-    {offsetof(GlobalPrefs, aiTocApiKey), SettingType::String, (intptr_t)"", nullptr},
-    {offsetof(GlobalPrefs, aiTocApiModel), SettingType::String, (intptr_t)"", nullptr},
-    {offsetof(GlobalPrefs, aiTocApiProfiles), SettingType::String, (intptr_t)"", nullptr},
-    {offsetof(GlobalPrefs, aiChatApiProfile), SettingType::Int, -1, nullptr},
-    {offsetof(GlobalPrefs, aiChatModel), SettingType::String, (intptr_t)"", nullptr},
-    {offsetof(GlobalPrefs, aiTocApiConcurrency), SettingType::Int, 4, nullptr},
-    {offsetof(GlobalPrefs, aiTocBodyProvider), SettingType::String, (intptr_t)"", nullptr},
-    {offsetof(GlobalPrefs, aiChatUseDeepSeekInsteadOfDoubao), SettingType::Bool, false, "已弃用，请用 AiChatProvider"},
-    {offsetof(GlobalPrefs, enableAskAI), SettingType::Bool, true, "显示 Ask AI 入口"},
     {offsetof(GlobalPrefs, enableInlineTranslate), SettingType::Bool, true, "显示划词翻译入口"},
     {offsetof(GlobalPrefs, translateVolcAccessKey), SettingType::String, (intptr_t)"",
      "火山翻译 Access Key（可 DPAPI 加密）"},
@@ -1316,15 +1280,14 @@ static const FieldInfo gGlobalPrefsFields[] = {
      "Settings below are not recognized by the current version"},
 };
 static const StructInfo gGlobalPrefsInfo = {
-    sizeof(GlobalPrefs), 146, gGlobalPrefsFields,
+    sizeof(GlobalPrefs), 135, gGlobalPrefsFields,
     "\0\0CheckForUpdates\0CustomScreenDPI\0DefaultDisplayMode\0DefaultZoom\0EnableTeXEnhancements\0EscToExit\0FullPathI"
     "nTitle\0InverseSearchCmdLine\0LazyLoading\0MainWindowBackground\0NoHomeTab\0HomePageSortByFrequentlyRead\0HomePage"
     "ViewMode\0HomePageThumbnailDx\0ReloadModifiedDocuments\0RememberOpenedFiles\0RememberStatePerDocument\0RestoreSess"
     "ion\0ReuseInstance\0ShowMenubar\0ShowMenubarWithTabs\0ShowTips\0CustomColors\0ShowToolbar\0ShowAnnotToolbarButtons"
     "\0SearchUIFloating\0OfflineDictionaryPath\0EnableDoubleClickWordLookup\0AutoOcrScanPages\0OcrAutoSave\0OcrDeskew\0"
-    "OcrFullDocumentMode\0OcrCopyMerged\0ExtractPdfTocMode\0AiChatProvider\0AiTocApiBaseUrl\0AiTocApiKey\0AiTocApiModel"
-    "\0AiTocApiProfiles\0AiChatApiProfile\0AiChatModel\0AiTocApiConcurrency\0AiTocBodyProvider\0AiChatUseDeepSeekInstea"
-    "dOfDoubao\0EnableAskAI\0EnableInlineTranslate\0TranslateVolcAccessKey\0TranslateVolcSecretKey\0TranslateTargetMode"
+    "OcrFullDocumentMode\0OcrCopyMerged\0ExtractPdfTocMode"
+    "\0EnableInlineTranslate\0TranslateVolcAccessKey\0TranslateVolcSecretKey\0TranslateTargetMode"
     "\0ShowFavorites\0ShowToc\0ShowLinks\0ShowStartPage\0SidebarDx\0Scrollbars\0ScrollbarInSinglePage\0SmoothScroll\0Wh"
     "eelScrollLines\0FastScrollOverScrollbar\0PreventSleepInFullscreen\0TabWidth\0TabFontSize\0TabBarHeight\0Theme\0Las"
     "tDarkTheme\0LastLightTheme\0DocumentColorMode\0DocumentImageDarkStrategy\0TocDy\0ToolbarSize\0TreeFontName\0TreeFo"

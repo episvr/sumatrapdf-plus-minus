@@ -59,7 +59,7 @@ struct SelectionToolbar {
 
 // Groups, left to right:
 // - Copy: the most common action, always first (as in system text menus)
-// - reading aids, light to heavy: Look Up, Translate, Ask AI; then Read Aloud (listening)
+// - reading aids, light to heavy: Look Up, Translate; then Read Aloud (listening)
 // - annotations: they change the document, so they come last
 static void InitButtons(SelectionToolbar* tb, MainWindow* win) {
     int i = 0;
@@ -73,9 +73,6 @@ static void InitButtons(SelectionToolbar* tb, MainWindow* win) {
     add(CmdLookupSelection, "Look Up", lookupEnabled, true);
     if (gGlobalPrefs->enableInlineTranslate) {
         add(CmdTranslateSelection, "Translate", true, false);
-    }
-    if (gGlobalPrefs->enableAskAI) {
-        add(CmdAnalyzeSelectionWithDoubao, "Ask AI", true, false);
     }
     add(CmdReadAloudSelection, "Read Aloud", HasPermission(Perm::CopySelection), false);
 

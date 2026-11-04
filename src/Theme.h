@@ -62,7 +62,7 @@ COLORREF ThemeNotificationsProgressColor();
 bool ThemeColorizeControls();
 bool ThemeUsesDarkChrome();
 // monotonically increasing counter, bumped on every resolved theme change;
-// lets transient UI (e.g. the AI TOC dialog) detect stale themed assets.
+// lets transient UI (e.g. the TOC dialog) detect stale themed assets.
 int ThemeEpoch();
 bool ThemeUsesBlackChrome();
 bool ThemeUsesOriginalPageColors();

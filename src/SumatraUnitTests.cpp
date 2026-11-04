@@ -24,7 +24,6 @@
 #include "Commands.h"
 #include "CharConv.h"
 #include "UpdateCheckPolicy.h"
-#include "TocAiPrompts.h"
 
 #include <float.h>
 #include <math.h>
@@ -384,26 +383,6 @@ static void SelectionHeightSettingsTest() {
     FreeStruct(&gGlobalPrefsInfo, prefs);
 }
 
-static void AiTocSettingsRoundTripTest() {
-    auto* prefs = (GlobalPrefs*)DeserializeStruct(&gGlobalPrefsInfo, nullptr);
-    const char* profiles =
-        R"({"active":1,"profiles":[{"name":"First","base_url":"https://example.test/v1","api_key":"test$only","model":"vision-a","concurrency":1},{"name":"第二平台","base_url":"https://other.test/v1","api_key":"other","model":"vision-b","concurrency":3}]})";
-    str::ReplaceWithCopy(&prefs->aiTocApiProfiles, profiles);
-    str::ReplaceWithCopy(&prefs->aiTocApiBaseUrl, "https://other.test/v1");
-    str::ReplaceWithCopy(&prefs->aiTocApiKey, "other");
-    str::ReplaceWithCopy(&prefs->aiTocApiModel, "vision-b");
-    prefs->aiTocApiConcurrency = 3;
-    AutoFree saved((char*)SerializeStruct(&gGlobalPrefsInfo, prefs).data());
-    auto* restored = (GlobalPrefs*)DeserializeStruct(&gGlobalPrefsInfo, saved.data);
-    utassert(str::Eq(restored->aiTocApiProfiles, profiles));
-    utassert(str::Eq(restored->aiTocApiBaseUrl, "https://other.test/v1"));
-    utassert(str::Eq(restored->aiTocApiKey, "other"));
-    utassert(str::Eq(restored->aiTocApiModel, "vision-b"));
-    utassert(restored->aiTocApiConcurrency == 3);
-    FreeStruct(&gGlobalPrefsInfo, restored);
-    FreeStruct(&gGlobalPrefsInfo, prefs);
-}
-
 static void WheelScrollPixelsTest() {
     auto* prefs = (GlobalPrefs*)DeserializeStruct(&gGlobalPrefsInfo, nullptr);
     utassert(prefs->wheelScrollLines == 0);
@@ -450,40 +429,7 @@ static void WheelScrollPixelsTest() {
     utassert(remainder == 0);
 }
 
-static void PrintedTocPromptTest() {
-    // Own copies: building the next prompt must not invalidate the one under test.
-    AutoFreeStr web(str::Dup(BuildPrintedTocPromptTemp(PrintedTocPromptFormat::Json)));
-    AutoFreeStr extract(str::Dup(BuildPrintedTocPromptTemp(PrintedTocPromptFormat::ExtractCsv)));
-    AutoFreeStr levels(str::Dup(BuildPrintedTocPromptTemp(PrintedTocPromptFormat::LevelsCsv)));
-    const char* split = str::Find(web.Get(), "\n\n");
-    utassert(split != nullptr);
-    if (!split) return;
-    size_t coreLen = split - web.Get();
-    utassert(coreLen > 1000);
-    utassert(strncmp(web.Get(), extract.Get(), coreLen) == 0);
-    utassert(strncmp(web.Get(), levels.Get(), coreLen) == 0);
-    utassert(str::Find(extract.Get(), "\n\n") == extract.Get() + coreLen);
-    utassert(str::Find(levels.Get(), "\n\n") == levels.Get() + coreLen);
-    utassert(str::Find(web.Get(), "不要猜测缺失页码") != nullptr);
-    utassert(str::Find(web.Get(), "禁止 LaTeX") != nullptr);
-    utassert(str::Find(web.Get(), "必须逐条拆开") != nullptr);
-    utassert(str::Find(web.Get(), "只输出按阅读顺序的主目录") != nullptr);
-    utassert(str::Find(split, "只返回合法 JSON") != nullptr);
-    utassert(str::Find(extract.Get() + coreLen, "title,page_number") != nullptr);
-    utassert(str::Find(extract.Get() + coreLen, "不输出层级") != nullptr);
-    utassert(str::Find(levels.Get() + coreLen, "title,page_number,level") != nullptr);
-    utassert(str::Find(levels.Get() + coreLen, "保持输入标题数量、顺序和页码（包括 null）") != nullptr);
-    utassert(str::Find(extract.Get() + coreLen, "items") == nullptr);
-    utassert(str::Find(levels.Get() + coreLen, "items") == nullptr);
-    AutoFreeStr body(BuildBodyTocPrompt(42, "<CANDIDATE id=\"C00012\">测试标题</CANDIDATE>"));
-    utassert(str::Find(body.Get(), "PDF_TOTAL_PAGES=42") != nullptr);
-    utassert(str::Find(body.Get(), "C00012") != nullptr);
-    utassert(str::Find(body.Get(), "<candidates>") != nullptr);
-    utassert(str::Find(body.Get(), "title,page_number") == nullptr);
-}
-
 void SumatraPDF_UnitTests() {
-    PrintedTocPromptTest();
     WheelScrollPixelsTest();
     parseCommandsTest();
     colorTest();
@@ -493,6 +439,5 @@ void SumatraPDF_UnitTests() {
     charconv_test();
     hexstrTest();
     UpdateCheckPolicyTest();
-    AiTocSettingsRoundTripTest();
     SelectionHeightSettingsTest();
 }

@@ -10,7 +10,7 @@ constexpr int RENDER_DELAY_FAILED = std::numeric_limits<int>::max() - 2;
 
 // Applies the same post-render theme recolor the render cache thread does for
 // view tiles (warm eye-care gauze, legacy bitmap recolor, DjVu dark, ...), so
-// off-screen callers (e.g. the AI TOC dialog thumbnails) match the canvas.
+// off-screen callers (e.g. the TOC dialog thumbnails) match the canvas.
 void ApplyRenderThemePostColors(EngineBase* engine, RenderedBitmap* bmp, int pageNo, float zoom, const RectF* pageRect,
                                 const DarkModeProfile* profile);
 

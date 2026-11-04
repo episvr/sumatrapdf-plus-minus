@@ -936,12 +936,6 @@
     <ClCompile Include="..\src\TocCalib.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\TocStructureScan.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\TocAiPrompts.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\WordLookup.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -1252,9 +1246,6 @@
       <Filter>cmd</Filter>
     </None>
     <None Include="..\cmd\trans-gen.ts">
-      <Filter>cmd</Filter>
-    </None>
-    <None Include="..\cmd\trans-with-ai.ts">
       <Filter>cmd</Filter>
     </None>
     <None Include="..\cmd\trigger-codeql.ts">

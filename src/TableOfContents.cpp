@@ -39,7 +39,6 @@
 #include "ReadAloudHighlight.h"
 #include "resource.h"
 #include "Commands.h"
-#include "AiToc.h"
 #include "ExtractPdfToc.h"
 #include "TocExtraction.h"
 #include "TocCalib.h"
@@ -2376,9 +2375,6 @@ static void TocContextMenu(ContextMenuEvent* ev) {
         case CmdExtractPdfToc:
             ShowTocExtraction(win);
             break;
-        case CmdAiRecognizePdfToc:
-            StartAiTocProofOfConcept(win);
-            break;
         case CmdPdfTocCalibrate:
             StartTocCalibFromExisting(win);
             break;
@@ -4232,7 +4228,6 @@ static void LayoutTocContainer(MainWindow* win) {
     bool thumbsOn = win->tocVisible && view == SidebarView::Thumbnails;
     bool favsOn = win->tocVisible && view == SidebarView::Favorites && win->favTreeView && win->favTreeView->hwnd &&
                   GetParent(win->favTreeView->hwnd) == hwndContainer;
-    bool aiOn = win->tocVisible && view == SidebarView::Ai;
     bool annotOn = win->tocVisible && view == SidebarView::Annotations;
     WindowTab* annotTab = win->CurrentTab();
     HWND annotHwnd = EditAnnotationsSidebarHwnd(annotTab);
@@ -4258,7 +4253,6 @@ static void LayoutTocContainer(MainWindow* win) {
     setShown(treeView ? treeView->hwnd : nullptr, bookmarksOn);
     setShown(win->hwndSidebarThumbs, thumbsOn);
     setShown(win->favTreeView ? win->favTreeView->hwnd : nullptr, favsOn);
-    setShown(win->hwndAiSidebar, aiOn);
     setShown(annotHwnd, annotOn);
     bool filterOn = bookmarksOn || thumbsOn || favsOn;
     setShown(edit ? edit->hwnd : nullptr, filterOn);
@@ -4295,8 +4289,6 @@ static void LayoutTocContainer(MainWindow* win) {
         body = win->hwndSidebarThumbs;
     } else if (favsOn && win->favTreeView) {
         body = win->favTreeView->hwnd;
-    } else if (aiOn) {
-        body = win->hwndAiSidebar;
     } else if (annotOn) {
         body = annotHwnd;
     }
@@ -5513,7 +5505,7 @@ void UpdateTocFilterForDocumentLoading(MainWindow* win) {
     }
     SidebarView view = CurrentSidebarView(win);
     // Reserve the search row even while a same-book outline is being rebuilt.
-    bool show = win->tocVisible && view != SidebarView::Ai && view != SidebarView::Annotations;
+    bool show = win->tocVisible && view != SidebarView::Annotations;
     HwndSetVisibility(win->tocFilterEdit->hwnd, show);
     RelayoutTocContainer(win);
 }

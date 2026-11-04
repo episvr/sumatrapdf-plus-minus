@@ -617,10 +617,6 @@ static MenuDef menuDefSelection[] = {
         CmdTranslateSelection,
     },
     {
-        _TRN("Ask &AI"),
-        CmdAnalyzeSelectionWithDoubao,
-    },
-    {
         _TRN("Look Up &Selection"),
         CmdLookupSelection,
     },
@@ -815,10 +811,6 @@ static MenuDef menuDefContext[] = {
         0,
     },
     {
-        _TRN("Ask &AI"),
-        CmdAnalyzeSelectionWithDoubao,
-    },
-    {
         _TRN("&Copy Selection"),
         CmdCopySelection,
     },
@@ -1008,7 +1000,6 @@ static UINT_PTR disableIfDirectoryOrBrokenPDF[] = {
 UINT_PTR disableIfNoSelection[] = {
     CmdCopySelection,
     CmdTranslateSelection,
-    CmdAnalyzeSelectionWithDoubao,
     CmdLookupSelection,
     CmdCreateAnnotHighlight,
     CmdCreateAnnotSquiggly,
@@ -1036,8 +1027,6 @@ static UINT_PTR menusNoTranslate[] = {
 UINT_PTR removeIfNoInternetPerms[] = {
     CmdCheckUpdate,
     CmdTranslateSelection,
-    CmdAnalyzeSelectionWithDoubao,
-    CmdOpenAskAi,
     CmdHelpVisitWebsite,
     CmdHelpOpenManualOnWebsite,
     CmdHelpOpenKeyboardShortcuts,
@@ -1064,7 +1053,6 @@ UINT_PTR removeIfNoPrefsPerms[] = {
 
 UINT_PTR removeIfNoCopyPerms[] = {
     CmdTranslateSelection,
-    CmdAnalyzeSelectionWithDoubao,
     CmdLookupSelection,
     CmdSelectAll,
 
@@ -1495,12 +1483,6 @@ std::pair<bool, bool> GetCommandIdState(BuildMenuCtx* ctx, UINT_PTR cmdId) {
     CommandVisibility visibility = GetCommandVisibility((int)cmdId, appCtx, CommandSurface::Menu);
     bool centralizedRemove = CommandShouldRemove(visibility);
     bool centralizedDisable = CommandShouldDisable(visibility);
-    if (!gGlobalPrefs->enableAskAI && (cmdId == CmdAnalyzeSelectionWithDoubao || cmdId == CmdOpenAskAi)) {
-        centralizedRemove = true;
-    }
-    if (cmdId == CmdOpenAskAi && !HasPermission(Perm::InternetAccess)) {
-        centralizedRemove = true;
-    }
     if (!gGlobalPrefs->enableInlineTranslate && cmdId == CmdTranslateSelection) {
         centralizedRemove = true;
     }
@@ -1527,9 +1509,6 @@ std::pair<bool, bool> GetCommandIdState(BuildMenuCtx* ctx, UINT_PTR cmdId) {
     bool disable = false;
     if (!HasPermission(Perm::InternetAccess)) {
         remove |= cmdIdInList(removeIfNoInternetPerms);
-    }
-    if (!gGlobalPrefs->enableAskAI && cmdId == CmdAnalyzeSelectionWithDoubao) {
-        remove = true;
     }
     if (!gGlobalPrefs->enableInlineTranslate && cmdId == CmdTranslateSelection) {
         remove = true;

@@ -240,7 +240,6 @@ static SeqStrings gCommandNames =
     "CmdToggleChmUI\0"
     "CmdSearchSelectionWithYoudaoDict\0"
     "CmdToggleLightDarkTheme\0"
-    "CmdAnalyzeSelectionWithDoubao\0"
     "CmdTranslateSelection\0"
     "CmdToggleDoubleClickWordLookup\0"
     "CmdTogglePreservePdfImages\0"
@@ -289,7 +288,6 @@ static SeqStrings gCommandNames =
     "CmdOcrReRecognizeAllPages\0"
     "CmdToggleOcrAutoSave\0"
     "CmdToggleOcrCopyMerged\0"
-    "CmdAiRecognizePdfToc\0"
     "CmdPdfRotatePages\0"
     "CmdDeskewPage\0"
     "CmdDeskewAllScannedPages\0"
@@ -304,7 +302,6 @@ static SeqStrings gCommandNames =
     "CmdPickEbookLatinFont\0"
     "CmdPickEbookCjkFont\0"
     "CmdAddHandwrittenSignature\0"
-    "CmdOpenAskAi\0"
     "CmdExportPageImages\0"
     "CmdCapturePageRegion\0"
     "CmdNone\0"
@@ -537,7 +534,6 @@ static i32 gCommandIds[] = {
     CmdToggleChmUI,
     CmdSearchSelectionWithYoudaoDict,
     CmdToggleLightDarkTheme,
-    CmdAnalyzeSelectionWithDoubao,
     CmdTranslateSelection,
     CmdToggleDoubleClickWordLookup,
     CmdTogglePreservePdfImages,
@@ -586,7 +582,6 @@ static i32 gCommandIds[] = {
     CmdOcrReRecognizeAllPages,
     CmdToggleOcrAutoSave,
     CmdToggleOcrCopyMerged,
-    CmdAiRecognizePdfToc,
     CmdPdfRotatePages,
     CmdDeskewPage,
     CmdDeskewAllScannedPages,
@@ -601,7 +596,6 @@ static i32 gCommandIds[] = {
     CmdPickEbookLatinFont,
     CmdPickEbookCjkFont,
     CmdAddHandwrittenSignature,
-    CmdOpenAskAi,
     CmdExportPageImages,
     CmdCapturePageRegion,
     CmdNone,
@@ -834,7 +828,6 @@ SeqStrings gCommandDescriptions =
     "Toggle CHM UI\0"
     "Search Selection with Youdao Dictionary\0"
     "Toggle light/dark theme\0"
-    "Ask AI\0"
     "Translate Selection\0"
     "Toggle Double-Click Word Lookup\0"
     "Toggle Preserve PDF Image Colors in Dark Mode\0"
@@ -883,7 +876,6 @@ SeqStrings gCommandDescriptions =
     "Recognize All Scanned Pages (Accurate)\0"
     "Toggle Auto-save After OCR\0"
     "Toggle Paragraph-merged Copy\0"
-    "AI Recognize Table of Contents\0"
     "Manually Adjust Pages...\0"
     "Deskew Page\0"
     "Deskew All Scanned Pages\0"
@@ -898,7 +890,6 @@ SeqStrings gCommandDescriptions =
     "Western Body Font\0"
     "CJK Body Font\0"
     "Add Handwritten Signature\0"
-    "Open Ask AI\0"
     "Export pages as images...\0"
     "Capture Page Region\0"
     "Do nothing\0"

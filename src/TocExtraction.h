@@ -10,7 +10,6 @@ struct MainWindow;
 struct ExtractedTocItem;
 
 void ShowTocExtraction(MainWindow* win);
-bool ConfirmTocPageSend(HWND parent, const WCHAR* message);
 // Matches only unambiguous internal links intersecting the source entry.
 int ApplyTocLinkEvidence(EngineBase* engine, Vec<ExtractedTocItem*>& roots);
 void PrepareTocExtractionResult(EngineBase* engine, Vec<ExtractedTocItem*>& roots);

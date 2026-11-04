@@ -4,7 +4,7 @@ import { spawnSync } from "node:child_process";
 
 // New Read Aloud settings / bar / menu strings.
 // cn/tw are authored; other languages fall back to English so the UI never
-// shows a blank string. Run cmd/trans-with-ai.ts afterwards if an API key is
+// shows a blank string. Run cmd/trans-dl.ts afterwards if an API key is
 // available, then re-run this script only for keys that are still missing.
 
 const rootDir = import.meta.dir + "/..";

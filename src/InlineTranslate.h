@@ -8,25 +8,9 @@ struct WindowTab;
 struct GlobalPrefs;
 
 bool InlineTranslateVolcIsConfigured();
-bool InlineTranslateAiApiIsConfigured();
 
 // Selection toolbar / menu: open the floating panel and translate.
 void TranslateSelectionInTab(MainWindow* win, WindowTab* tab);
-
-// Ask AI with configured AiToc API. Opens the AI sidebar page and sends
-// initialPrompt. The floating Ask AI popup is no longer the normal path.
-void AskAiSelectionInTab(MainWindow* win, WindowTab* tab, const char* selection, const char* initialPrompt);
-
-// Page context menu / command: show the AI sidebar without sending a question.
-void OpenEmptyAskAi(MainWindow* win);
-
-// Sidebar page. Conversation stays on the tab for this session only.
-void EnsureAskAiSidebar(MainWindow* win);
-void LayoutAskAiSidebar(MainWindow* win);
-void LayoutAskAiSidebar(MainWindow* win);
-void ParkAskAiSidebar(WindowTab* tab);
-void BindAskAiSidebar(WindowTab* tab);
-void FreeTabAskAiState(WindowTab* tab);
 
 // clearSelection drops the document highlight when the user dismisses the popup.
 void CloseInlineTranslatePopup(bool clearSelection = false);
@@ -47,9 +31,3 @@ bool InlineTranslateVolcTest(const char* ak, const char* sk, char** resultOut, c
 void InlineTranslateUnprotectPrefsSecrets(GlobalPrefs* prefs);
 void InlineTranslateProtectPrefsSecretsForSave(GlobalPrefs* prefs, char** plainAkOut, char** plainSkOut);
 void InlineTranslateRestorePrefsSecretsAfterSave(GlobalPrefs* prefs, char* plainAk, char* plainSk);
-
-// Refresh credentials/defaults after saving the shared AI settings, preserving messages.
-void RefreshAskAiSettings();
-
-// Offline RichEdit rendering regression; does not contact an AI provider.
-bool TestAskAiChatLayout();

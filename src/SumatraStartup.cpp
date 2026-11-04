@@ -709,7 +709,7 @@ bool PumpAppMessage(MSG& msg) {
         return true;
     }
     // The splitter is one pixel. The <-> arrow is wider than that, and its
-    // hotspot is the middle. Annotations, Ask AI, bookmarks, and thumbnails
+    // hotspot is the middle. Annotations, bookmarks, and thumbnails
     // all use this strip, including clicks that land on a child control.
     bool splitterCursor = false;
     if (msg.message == WM_LBUTTONDOWN || msg.message == WM_NCLBUTTONDOWN || msg.message == WM_MOUSEMOVE ||
@@ -1433,27 +1433,6 @@ static void LogCommandLine() {
     logf("'%s'\n  ver %s\n", s, UPDATE_CHECK_VERA);
 }
 
-struct BrowserChatUiTaskWrap {
-    BrowserChatUiTaskFn fn;
-    void* ctx;
-};
-
-static void BrowserChatUiTaskTrampoline(BrowserChatUiTaskWrap* w) {
-    w->fn(w->ctx);
-    free(w);
-}
-
-static void InvokeBrowserChatUiTask(BrowserChatUiTaskFn fn, void* ctx) {
-    auto* w = (BrowserChatUiTaskWrap*)malloc(sizeof(BrowserChatUiTaskWrap));
-    if (!w) {
-        fn(ctx);
-        return;
-    }
-    w->fn = fn;
-    w->ctx = ctx;
-    uitask::Invoke(MkFunc0(BrowserChatUiTaskTrampoline, w), "AiChatPasteSubmit");
-}
-
 int APIENTRY WinMain(_In_ HINSTANCE /*hInstance*/, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
     int exitCode = 1; // by default it's error
     int nWithDde = 0;
@@ -1500,8 +1479,6 @@ int APIENTRY WinMain(_In_ HINSTANCE /*hInstance*/, _In_opt_ HINSTANCE, _In_ LPST
     ScopedGdiPlus gdiPlus(true);
     mui::Initialize();
     uitask::Initialize();
-
-    SetBrowserChatUiTaskRunner(InvokeBrowserChatUiTask);
 
     if (!IsDebuggerPresent()) {
         // VSCode shows both debugger output and console out which doubles the logging
@@ -1775,11 +1752,6 @@ int APIENTRY WinMain(_In_ HINSTANCE /*hInstance*/, _In_opt_ HINSTANCE, _In_ LPST
     }
     if (flags.extractTocBench) {
         TestExtractTocBench(flags);
-        ShutdownCommon();
-        return 0;
-    }
-    if (flags.testBodyToc) {
-        TestBodyTocParsing(flags);
         ShutdownCommon();
         return 0;
     }

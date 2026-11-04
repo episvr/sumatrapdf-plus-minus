@@ -79,7 +79,7 @@ struct TocCalibSession {
     Vec<PageMappingSegment> offsetSegs;
     int tocPage = 0;
     int tocEnd = 0;
-    // PDF pages the user confirmed and sent for AI TOC. Double-click searches
+    // PDF pages the user confirmed as printed-TOC sheets. Double-click searches
     // only these sheets. Empty means the range was guessed from the document.
     Vec<int> confirmedTocPages;
     int nPages = 0;

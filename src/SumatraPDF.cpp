@@ -93,11 +93,9 @@
 #include "FindBar.h"
 #include "FindWindow.h"
 #include "WordLookup.h"
-#include "AiTocApi.h"
 #include "InlineTranslate.h"
 #include "HandwrittenSignature.h"
 #include "OcrService.h"
-#include "AiToc.h"
 #include "AppDialogTheme.h"
 #include "PrintedTocModel.h"
 #include "ExtractPdfToc.h"
@@ -189,7 +187,6 @@ char* gCopyBenchOutPath = nullptr;
 
 static void RelayoutFrame(MainWindow* win, bool updateToolbars = true, int sidebarDx = -1);
 static void PaintToolbarContentHairline(MainWindow* win, HDC hdc);
-static void SyncSidebarColumnWidth(MainWindow* win);
 static bool gSidebarSplitterWrapSuspended = false;
 static bool gSidebarWidthDragScrollbarsHidden = false;
 static constexpr UINT WM_SIDEBAR_RELAYOUT = WM_APP + 0x423;
@@ -946,11 +943,7 @@ void RememberDefaultWindowPosition(MainWindow* win) {
         gGlobalPrefs->windowState = WIN_STATE_NORMAL;
     }
 
-    if (win->sidebarWidthIsAi && win->plainSidebarDx > 0) {
-        gGlobalPrefs->sidebarDx = win->plainSidebarDx;
-    } else if (!win->sidebarWidthIsAi) {
-        gGlobalPrefs->sidebarDx = WindowRect(win->hwndTocBox).dx;
-    }
+    gGlobalPrefs->sidebarDx = WindowRect(win->hwndTocBox).dx;
 
     if (IsIconic(win->hwndFrame) || win->presentation) {
         return;
@@ -4156,7 +4149,7 @@ void UpdateAfterThemeChange() {
         0);
     RefreshAllAppDialogsTheme();
     RefreshWordLookupTheme();
-    // Prepare the translation / Ask AI popup while the frame is still frozen,
+    // Prepare the translation popup while the frame is still frozen,
     // but do not paint it yet. Its controls update together with the frame below.
     RefreshInlineTranslatePopupTheme();
     RefreshDisplayFilterPanelsTheme();
@@ -5511,7 +5504,6 @@ void LoadModelIntoTab(WindowTab* tab) {
         if (win->hwndFindEdit || win->findThread || win->findCountThread) {
             ResetFindUIForTabSwitch(win);
         }
-        ParkAskAiSidebar(prevTab);
         // Embedded PDF Sound/RichMedia/Screen audio is global; stop when leaving the tab.
         LookupAudioStop();
         if (prevTab) {
@@ -5630,7 +5622,6 @@ void LoadModelIntoTab(WindowTab* tab) {
     } else {
         SetSidebarVisibility(win, tab->showToc, gGlobalPrefs->showFavorites);
     }
-    BindAskAiSidebar(tab);
 
     if (dm) {
         if (tab->canvasRc != win->canvasRc) {
@@ -9019,9 +9010,6 @@ static void RelayoutFrame(MainWindow* win, bool updateToolbars, int sidebarDx) {
         // (and SetSidebarVisibility relies on this for initialization)
         UpdateTocSelection(win, win->ctrl->CurrentPageNo());
     }
-    if (sidebarDx == -1 && !liveSidebarDrag && tocVisible) {
-        SyncSidebarColumnWidth(win);
-    }
 
     // reposition overlay scrollbars after relayout (they were hidden at the
     // start to prevent stale positioning); skip during fullscreen transitions
@@ -9109,7 +9097,7 @@ void SetCurrentLanguageAndRefreshUI(const char* langCode) {
         UpdateToolbarSidebarText(win);
         if (win->tocLabelWithClose) win->tocLabelWithClose->Layout();
         if (win->favLabelWithClose) win->favLabelWithClose->Layout();
-        HWND sidebarWindows[] = {win->hwndTocBox, win->hwndFavBox, win->hwndSidebarThumbs, win->hwndAiSidebar};
+        HWND sidebarWindows[] = {win->hwndTocBox, win->hwndFavBox, win->hwndSidebarThumbs};
         for (HWND hwnd : sidebarWindows) {
             if (hwnd) {
                 RedrawWindow(hwnd, nullptr, nullptr,
@@ -9295,8 +9283,6 @@ static void ShowOptionsDialog(HWND hwnd, int initialPage = 0) {
     if (IDOK != dialogResult) {
         return;
     }
-
-    RefreshAskAiSettings();
 
     if (!autoOcrScanPagesBefore && gGlobalPrefs->autoOcrScanPages) {
         if (MainWindow* ocrWin = FindMainWindowByHwnd(hwnd)) {
@@ -10430,60 +10416,10 @@ void SetSidebarColumnDx(MainWindow* win, int dx) {
     }
     Rect rFrame = ClientRect(win->hwndFrame);
     int maxDx = std::max(kSidebarMinDx, rFrame.dx / 2);
-    int requested = dx;
     dx = limitValue(dx, kSidebarMinDx, maxDx);
-    if (win->sidebarWidthIsAi) {
-        // A narrow frame clamps the column. Don't remember that clamp as the AI width.
-        if (requested <= maxDx) {
-            win->aiSidebarDx = dx;
-        }
-    } else {
-        gGlobalPrefs->sidebarDx = dx;
-        win->plainSidebarDx = dx;
-    }
+    gGlobalPrefs->sidebarDx = dx;
+    win->plainSidebarDx = dx;
     RelayoutFrame(win, false, dx);
-}
-
-// Bookmarks and AI keep separate widths. The AI width stays in this session.
-static void SyncSidebarColumnWidth(MainWindow* win) {
-    if (!win || !win->hwndTocBox || !win->hwndFrame || !win->tocVisible) {
-        return;
-    }
-    bool ai = CurrentSidebarView(win) == SidebarView::Ai;
-    if (ai && win->sidebarWidthIsAi) {
-        int curNow = ClientRect(win->hwndTocBox).dx;
-        int minAi = DpiScale(win->hwndFrame, 280);
-        int maxDx = std::max(kSidebarMinDx, ClientRect(win->hwndFrame).dx / 2);
-        if (curNow > 0 && curNow < minAi && maxDx >= minAi) {
-            int want = win->aiSidebarDx >= minAi ? win->aiSidebarDx : DpiScale(win->hwndFrame, 400);
-            SetSidebarColumnDx(win, want);
-        }
-        return;
-    }
-    if (ai == win->sidebarWidthIsAi) {
-        return;
-    }
-    int cur = ClientRect(win->hwndTocBox).dx;
-    if (win->sidebarWidthIsAi && cur > 0) {
-        win->aiSidebarDx = cur;
-    }
-    if (!win->sidebarWidthIsAi && cur > 0) {
-        win->plainSidebarDx = cur;
-    }
-    win->sidebarWidthIsAi = ai;
-    int want = 0;
-    if (ai) {
-        want = win->aiSidebarDx > 0 ? win->aiSidebarDx : DpiScale(win->hwndFrame, 400);
-        int minAi = DpiScale(win->hwndFrame, 280);
-        if (want < minAi) {
-            want = minAi;
-        }
-    } else {
-        want = win->plainSidebarDx > 0 ? win->plainSidebarDx : gGlobalPrefs->sidebarDx;
-    }
-    if (want > 0 && want != cur) {
-        SetSidebarColumnDx(win, want);
-    }
 }
 
 void EnsureSidebarDxAtLeast(MainWindow* win, int minDx) {
@@ -10626,9 +10562,6 @@ static void OnSidebarSplitterMove(Splitter::MoveEvent* ev) {
     Rect rFrame = ClientRect(win->hwndFrame);
     Rect rToc = ClientRect(win->hwndTocBox);
     int minDx = std::min(kSidebarMinDx, rToc.dx);
-    if (CurrentSidebarView(win) == SidebarView::Ai) {
-        minDx = std::max(minDx, DpiScale(win->hwndFrame, 280));
-    }
     if (CurrentSidebarView(win) == SidebarView::Bookmarks && TocCalibIsActive(win) && win->tocTreeView &&
         win->tocTreeView->hwnd) {
         // Keep printed/pdf fields + title readable while calibrating.
@@ -10656,12 +10589,8 @@ static void OnSidebarSplitterMove(Splitter::MoveEvent* ev) {
             gTocDragPerf = {};
             gTocDragStartDx = rToc.dx;
         }
-        if (win->sidebarWidthIsAi) {
-            win->aiSidebarDx = sidebarDx;
-        } else {
-            gGlobalPrefs->sidebarDx = sidebarDx;
-            win->plainSidebarDx = sidebarDx;
-        }
+        gGlobalPrefs->sidebarDx = sidebarDx;
+        win->plainSidebarDx = sidebarDx;
         ScheduleSidebarRelayout(win, sidebarDx);
         return;
     }
@@ -10672,12 +10601,8 @@ static void OnSidebarSplitterMove(Splitter::MoveEvent* ev) {
     // legitimately > maxDx here. Skipping the finalization leaves the layout
     // at the last in-range mouse position (and stale TOC wrap heights).
     int finalDx = limitValue(sidebarDx, minDx, maxDx);
-    if (win->sidebarWidthIsAi) {
-        win->aiSidebarDx = finalDx;
-    } else {
-        gGlobalPrefs->sidebarDx = finalDx;
-        win->plainSidebarDx = finalDx;
-    }
+    gGlobalPrefs->sidebarDx = finalDx;
+    win->plainSidebarDx = finalDx;
     if (gSidebarSplitterWrapSuspended) {
         // Supersede any queued intermediate width. The posted message becomes
         // a harmless no-op after this synchronous final pass.
@@ -10946,10 +10871,6 @@ void SetSidebarVisibility(MainWindow* win, bool tocVisible, bool showFavorites, 
         tab->showTocPresentation = column;
     }
     win->tocVisible = column;
-    if (column) {
-        SyncSidebarColumnWidth(win);
-    }
-
     // Favorites lives in the same column. A true flag here splits the sidebar in two.
     gGlobalPrefs->showFavorites = false;
     bool thumbsOn = column && tab && (SidebarView)tab->sidebarView == SidebarView::Thumbnails;
@@ -11085,192 +11006,6 @@ static void LaunchBrowserWithSelection(WindowTab* tab, const char* urlPattern) {
     LaunchBrowserWithReuse(uri);
 }
 
-enum class DoubaoPromptKind {
-    Word,
-    Sentence,
-    Chinese,
-};
-
-static bool Utf8DecodeOne(const char*& s, char32_t* cpOut) {
-    if (!s || !*s || !cpOut) {
-        return false;
-    }
-    u8 c0 = (u8)s[0];
-    if (c0 < 0x80) {
-        *cpOut = c0;
-        s += 1;
-        return true;
-    }
-    if ((c0 & 0xE0) == 0xC0 && s[1]) {
-        *cpOut = ((c0 & 0x1F) << 6) | ((u8)s[1] & 0x3F);
-        s += 2;
-        return true;
-    }
-    if ((c0 & 0xF0) == 0xE0 && s[1] && s[2]) {
-        *cpOut = ((c0 & 0x0F) << 12) | (((u8)s[1] & 0x3F) << 6) | ((u8)s[2] & 0x3F);
-        s += 3;
-        return true;
-    }
-    if ((c0 & 0xF8) == 0xF0 && s[1] && s[2] && s[3]) {
-        *cpOut = ((c0 & 0x07) << 18) | (((u8)s[1] & 0x3F) << 12) | (((u8)s[2] & 0x3F) << 6) | ((u8)s[3] & 0x3F);
-        s += 4;
-        return true;
-    }
-    *cpOut = c0;
-    s += 1;
-    return true;
-}
-
-static bool IsCjkIdeograph(char32_t cp) {
-    return (cp >= 0x4E00 && cp <= 0x9FFF) || (cp >= 0x3400 && cp <= 0x4DBF) || (cp >= 0xF900 && cp <= 0xFAFF);
-}
-
-static bool IsLatinLetter(char32_t cp) {
-    return (cp >= 'A' && cp <= 'Z') || (cp >= 'a' && cp <= 'z');
-}
-
-static bool SelectionContainsCjk(const char* s) {
-    const char* p = s;
-    while (p && *p) {
-        char32_t cp = 0;
-        if (!Utf8DecodeOne(p, &cp)) {
-            break;
-        }
-        if (IsCjkIdeograph(cp)) {
-            return true;
-        }
-    }
-    return false;
-}
-
-static bool SelectionIsSingleWord(const char* s) {
-    if (!s || !*s) {
-        return false;
-    }
-    const char* p = s;
-    int letterCount = 0;
-    while (*p) {
-        if (str::IsWs(*p)) {
-            return false;
-        }
-        char32_t cp = 0;
-        if (!Utf8DecodeOne(p, &cp)) {
-            break;
-        }
-        if (cp == '-' || cp == '\'' || cp == '.') {
-            continue;
-        }
-        if (IsLatinLetter(cp)) {
-            letterCount++;
-            continue;
-        }
-        return false;
-    }
-    return letterCount > 0 && letterCount <= 48;
-}
-
-static DoubaoPromptKind ClassifyDoubaoSelection(const char* s) {
-    char* trimmed = str::Dup(s);
-    str::TrimWSInPlace(trimmed, str::TrimOpt::Both);
-    defer {
-        str::Free(trimmed);
-    };
-    if (str::IsEmpty(trimmed)) {
-        return DoubaoPromptKind::Sentence;
-    }
-    if (SelectionContainsCjk(trimmed)) {
-        return DoubaoPromptKind::Chinese;
-    }
-    if (SelectionIsSingleWord(trimmed)) {
-        return DoubaoPromptKind::Word;
-    }
-    return DoubaoPromptKind::Sentence;
-}
-
-static TempStr BuildDoubaoPromptTemp(const char* selection, DoubaoPromptKind kind) {
-    char* trimmed = str::Dup(selection);
-    str::TrimWSInPlace(trimmed, str::TrimOpt::Both);
-    defer {
-        str::Free(trimmed);
-    };
-    switch (kind) {
-        case DoubaoPromptKind::Word:
-            return str::FormatTemp("%s\n%s",
-                                   _TRA("Please look up this word and give phonetic transcription, "
-                                        "pronunciation, definition, examples, and mnemonics:"),
-                                   trimmed);
-        case DoubaoPromptKind::Chinese:
-            return str::FormatTemp("%s\n%s", _TRA("Please explain what the following Chinese text means:"), trimmed);
-        case DoubaoPromptKind::Sentence:
-            return str::FormatTemp("%s\n%s",
-                                   _TRA("Please translate this sentence and analyze its syntax and difficult "
-                                        "vocabulary:"),
-                                   trimmed);
-    }
-    return str::FormatTemp("%s", trimmed);
-}
-
-static AiChatService ActiveAiChatService() {
-    if (!gGlobalPrefs) {
-        return AiChatService::Doubao;
-    }
-    const char* p = gGlobalPrefs->aiChatProvider;
-    if (str::EqI(p, "deepseek")) {
-        return AiChatService::DeepSeek;
-    }
-    if (str::EqI(p, "chatgpt")) {
-        return AiChatService::ChatGPT;
-    }
-    return AiChatService::Doubao;
-}
-
-static void AnalyzeSelectionWithDoubao(WindowTab* tab) {
-    if (!tab || !tab->win || !gGlobalPrefs->enableAskAI || !HasPermission(Perm::InternetAccess) ||
-        !HasPermission(Perm::CopySelection)) {
-        return;
-    }
-
-    bool isTextOnlySelectionOut;
-    TempStr selText = GetSelectedTextTemp(tab, "\n", isTextOnlySelectionOut);
-    if (!selText) {
-        return;
-    }
-
-    DisplayModel* dm = tab->AsFixed();
-    if (dm && !gDisableDocumentRestrictions && !dm->GetEngine()->AllowsCopyingText()) {
-        NotificationCreateArgs args;
-        args.hwndParent = tab->win->hwndCanvas;
-        args.msg = _TRA("Copying text was denied");
-        args.timeoutMs = 3000;
-        ShowNotification(args);
-        return;
-    }
-
-    DoubaoPromptKind kind = ClassifyDoubaoSelection(selText);
-    TempStr prompt = BuildDoubaoPromptTemp(selText, kind);
-    if (!prompt) {
-        return;
-    }
-
-    // Prefer in-app API panel when AiToc API is configured; otherwise open web chat.
-    AiTocApiConfig cfg;
-    cfg.baseUrl = gGlobalPrefs->aiTocApiBaseUrl;
-    cfg.key = gGlobalPrefs->aiTocApiKey;
-    cfg.model = gGlobalPrefs->aiTocApiModel;
-    if (AiTocApiIsConfigured(cfg)) {
-        AskAiSelectionInTab(tab->win, tab, selText, prompt);
-        return;
-    }
-
-    AiChatService service = ActiveAiChatService();
-    LaunchAiChatWithPromptAsync(service, prompt);
-
-    NotificationCreateArgs args;
-    args.hwndParent = tab->win->hwndCanvas;
-    args.msg = _TRA("Question sent to AI.");
-    args.timeoutMs = 5000;
-    ShowNotification(args);
-}
 
 // TODO: rather arbitrary divide of responsibility between this and CopySelectionToClipboard()
 static void CopySelectionInTabToClipboard(WindowTab* tab) {
@@ -12940,14 +12675,6 @@ static LRESULT FrameOnCommand(MainWindow* win, HWND hwnd, UINT msg, WPARAM wp, L
             LaunchBrowserWithSelection(tab, "https://dict.youdao.com/result?word=${selection}&lang=en");
             break;
 
-        case CmdAnalyzeSelectionWithDoubao:
-            AnalyzeSelectionWithDoubao(tab);
-            break;
-
-        case CmdOpenAskAi:
-            OpenEmptyAskAi(win);
-            break;
-
         case CmdTranslateSelection:
             TranslateSelectionInTab(win, tab);
             break;
@@ -13128,10 +12855,6 @@ static LRESULT FrameOnCommand(MainWindow* win, HWND hwnd, UINT msg, WPARAM wp, L
             } else {
                 ShowTocExtraction(win);
             }
-            break;
-
-        case CmdAiRecognizePdfToc:
-            StartAiTocProofOfConcept(win);
             break;
 
         case CmdPdfTocCalibrate:
@@ -17266,7 +16989,6 @@ static void RefreshWindowChromeAfterFontInvalidate(MainWindow* win) {
 
     RefreshSidebarDpiFonts(win);
     RelayoutWindow(win);
-    LayoutAskAiSidebar(win);
     ReadAloudBarUpdate(win);
     win->RedrawAll(true);
 }
@@ -17329,7 +17051,6 @@ static void ApplyMainWindowDpiMovePreview(MainWindow* win, HWND hwnd) {
         win->tabsCtrl->LayoutTabs();
     }
     ApplySidebarDpiMovePreview(win);
-    LayoutAskAiSidebar(win);
     ReadAloudBarUpdate(win);
 
     CloseEditAnnotationsWindowsForDpiMove(win);
@@ -17388,7 +17109,6 @@ static void ApplyMainWindowDpiChromeRefresh(MainWindow* win, HWND hwnd) {
 
     // These children may keep exactly the same pixel bounds on the return
     // trip, so WM_SIZE is not a reliable trigger for refreshing their fonts.
-    LayoutAskAiSidebar(win);
     ReadAloudBarUpdate(win);
 
     if (win->tabsInTitlebar && !win->captionRect.IsEmpty()) {

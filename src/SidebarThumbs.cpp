@@ -99,9 +99,6 @@ SidebarView SidebarViewFromStr(const char* s) {
     if (str::EqI(s, "favorites")) {
         return SidebarView::Favorites;
     }
-    if (str::EqI(s, "ai")) {
-        return SidebarView::Ai;
-    }
     if (str::EqI(s, "annotations")) {
         return SidebarView::Annotations;
     }
@@ -114,8 +111,6 @@ const char* SidebarViewToStr(SidebarView view) {
             return "thumbnails";
         case SidebarView::Favorites:
             return "favorites";
-        case SidebarView::Ai:
-            return "ai";
         case SidebarView::Annotations:
             return "annotations";
         default:
@@ -146,8 +141,6 @@ bool SidebarViewAvailable(MainWindow* win, SidebarView view) {
             return !win->AsChm() && win->ctrl->PageCount() > 0;
         case SidebarView::Favorites:
             return !gPluginMode && CanAccessDisk();
-        case SidebarView::Ai:
-            return gGlobalPrefs && gGlobalPrefs->enableAskAI && HasPermission(Perm::InternetAccess);
         case SidebarView::Annotations: {
             WindowTab* tab = win->CurrentTab();
             if (!tab) {
@@ -396,7 +389,7 @@ static void RenderOneThumb(SidebarThumbsWnd* t) {
     if (!engine) {
         return;
     }
-    // Same coloring as the printed-TOC page picker (RenderAiTocThumbnail):
+    // Same coloring as the printed-TOC page picker:
     // the view profile, Export pixels, then post colors with the page box.
     // A second LegacyInvert on a reflow page that is already themed turns it light.
     RectF box = engine->PageMediabox(pageNo);
@@ -1370,8 +1363,8 @@ void BindSidebarFindEdit(MainWindow* win, SidebarView view) {
     if (!win || !win->tocFilterEdit) {
         return;
     }
-    // The AI and annotations pages have no title filter. Leave the bookmark query stored.
-    if (view == SidebarView::Ai || view == SidebarView::Annotations) {
+    // The annotations page has no title filter. Leave the bookmark query stored.
+    if (view == SidebarView::Annotations) {
         win->sidebarFindBound = (int)view;
         return;
     }
@@ -1421,10 +1414,6 @@ static void OnSidebarThumbnails(MainWindow* win) {
 
 static void OnSidebarFavorites(MainWindow* win) {
     ShowSidebarPage(win, SidebarView::Favorites);
-}
-
-static void OnSidebarAi(MainWindow* win) {
-    ShowSidebarPage(win, SidebarView::Ai);
 }
 
 static void OnFavAddCurrent(MainWindow* win) {
@@ -1483,14 +1472,6 @@ void UpdateSidebarViewButtons(MainWindow* win) {
     btns[3].enabled = SidebarViewAvailable(win, SidebarView::Annotations);
     btns[3].onClick = MkFunc0(OnSidebarAnnotations, win);
     int nBtns = 4;
-    if (gGlobalPrefs && gGlobalPrefs->enableAskAI) {
-        btns[4].icon = TbIcon::SidebarAi;
-        btns[4].tooltip = _TRN("Ask AI");
-        btns[4].selected = shown && cur == SidebarView::Ai;
-        btns[4].enabled = SidebarViewAvailable(win, SidebarView::Ai);
-        btns[4].onClick = MkFunc0(OnSidebarAi, win);
-        nBtns = 5;
-    }
     win->tocLabelWithClose->SetViewButtons(btns, nBtns);
     win->tocLabelWithClose->SetHeaderActionsVisible(shown && cur == SidebarView::Bookmarks);
     if (shown && cur == SidebarView::Favorites) {
@@ -1524,11 +1505,7 @@ void ApplySidebarViewLayout(MainWindow* win) {
     bool bookmarks = win->tocVisible && view == SidebarView::Bookmarks;
     bool thumbs = win->tocVisible && view == SidebarView::Thumbnails;
     bool favs = win->tocVisible && view == SidebarView::Favorites;
-    bool ai = win->tocVisible && view == SidebarView::Ai;
     bool annots = win->tocVisible && view == SidebarView::Annotations;
-    if (ai) {
-        EnsureAskAiSidebar(win);
-    }
     // Show* lays the sidebar out again. The flag stops that from creating a second editor.
     static bool creatingAnnotSidebar = false;
     if (annots && tab && !creatingAnnotSidebar && !EditAnnotationsSidebarHwnd(tab) &&
@@ -1554,9 +1531,6 @@ void ApplySidebarViewLayout(MainWindow* win) {
     if (win->hwndSidebarThumbs) {
         ShowWindow(win->hwndSidebarThumbs, thumbs ? SW_SHOW : SW_HIDE);
     }
-    if (win->hwndAiSidebar) {
-        ShowWindow(win->hwndAiSidebar, ai ? SW_SHOW : SW_HIDE);
-    }
     if (win->favTreeView && win->favTreeView->hwnd) {
         HWND parent = favs ? win->hwndTocBox : win->hwndFavBox;
         if (parent && GetParent(win->favTreeView->hwnd) != parent) {
@@ -1569,12 +1543,6 @@ void ApplySidebarViewLayout(MainWindow* win) {
     }
     UpdateSidebarViewButtons(win);
     RelayoutTocContainer(win);
-    if (ai) {
-        LayoutAskAiSidebar(win);
-    }
-    if (ai) {
-        LayoutAskAiSidebar(win);
-    }
     if (thumbs && win->hwndSidebarThumbs) {
         InvalidateRect(win->hwndSidebarThumbs, nullptr, TRUE);
         SidebarThumbsSyncCurrentPage(win);

@@ -413,7 +413,7 @@ static void SafeDeleteWordLookupWnd(WordLookupWnd* wnd) {
     }
     WordLookupResumeReadAloudIfNeeded(wnd);
     delete wnd;
-    // Keep the highlight while a translation or Ask AI popup still shows this passage.
+    // Keep the highlight while a translation popup still shows this passage.
     if (clearSelection && !IsInlineTranslatePopupVisible()) {
         ClearSelectionIfCurrent(win, sel);
     }

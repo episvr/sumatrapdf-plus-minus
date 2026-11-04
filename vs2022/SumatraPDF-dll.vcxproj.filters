@@ -1176,9 +1176,6 @@
     <None Include="..\cmd\trans-gen.ts">
       <Filter>cmd</Filter>
     </None>
-    <None Include="..\cmd\trans-with-ai.ts">
-      <Filter>cmd</Filter>
-    </None>
     <None Include="..\cmd\trigger-codeql.ts">
       <Filter>cmd</Filter>
     </None>

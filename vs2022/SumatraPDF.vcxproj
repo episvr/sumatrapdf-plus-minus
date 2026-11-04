@@ -1329,8 +1329,6 @@
     <ClCompile Include="..\src\HomePage.cpp" />
     <ClCompile Include="..\src\HtmlFormatter.cpp" />
     <ClCompile Include="..\src\ImageSaveCropResize.cpp" />
-    <ClCompile Include="..\src\AiToc.cpp" />
-    <ClCompile Include="..\src\AiTocApi.cpp" />
     <ClCompile Include="..\src\Installer.cpp" />
     <ClCompile Include="..\src\InstallerCommon.cpp" />
     <ClCompile Include="..\src\LookupAudio.cpp" />
@@ -1450,8 +1448,6 @@
     <ClCompile Include="..\src\ExtractBookToc.cpp" />
     <ClCompile Include="..\src\TocExtraction.cpp" />
     <ClCompile Include="..\src\TocCalib.cpp" />
-    <ClCompile Include="..\src\TocStructureScan.cpp" />
-    <ClCompile Include="..\src\TocAiPrompts.cpp" />
     <ClCompile Include="..\src\WordLookup.cpp" />
     <ClCompile Include="..\src\InlineTranslateLang.cpp" />
     <ClCompile Include="..\src\InlineTranslate.cpp" />
@@ -1823,7 +1819,6 @@
     <None Include="..\cmd\trans-add-placeholder.ts" />
     <None Include="..\cmd\trans-dl.ts" />
     <None Include="..\cmd\trans-gen.ts" />
-    <None Include="..\cmd\trans-with-ai.ts" />
     <None Include="..\cmd\trigger-codeql.ts" />
     <None Include="..\cmd\tsconfig.json" />
     <None Include="..\cmd\util.ts" />

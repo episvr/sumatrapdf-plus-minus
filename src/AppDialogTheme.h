@@ -48,7 +48,7 @@ void AppDialogPaintEditFrame(HWND hwnd, HDC dc, const RECT& rc, COLORREF page, b
 void AppDialogInsetComboEdit(HWND combo);
 void AppDialogComboClosedFaceRect(HWND combo, RECT* rect);
 
-// Theme only the vertical scrollbar (Ask AI / InlineTranslate pattern). Keeps a
+// Theme only the vertical scrollbar (InlineTranslate pattern). Keeps a
 // blank or custom list face for Warm cream CTLCOLOR while adapting White /
 // Warm / Dracula / Dark bars via Explorer::ScrollBar / DarkMode_Explorer::ScrollBar.
 void AppDialogThemeScrollBar(HWND hwnd);

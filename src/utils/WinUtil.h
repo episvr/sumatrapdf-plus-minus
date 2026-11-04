@@ -93,40 +93,6 @@ bool LaunchFileShell(const char* path, const char* params = nullptr, const char*
 bool LaunchBrowser(const char* url);
 bool LaunchBrowserWithReuse(const char* url, bool navigateOnReuse = true, bool* reusedOut = nullptr,
                             HWND* browserHwndOut = nullptr, bool* navigatedOut = nullptr);
-bool PasteClipboardToBrowserChatInput(HWND browserHwnd, int delayBeforePasteMs = 150);
-bool PasteAndSubmitBrowserChatInput(HWND browserHwnd, int delayBeforePasteMs = 150);
-bool PasteAndSubmitBrowserChatInputWhenReady(HWND browserHwnd, const char* url, bool waitForPageReady,
-                                             bool dismissChromeFocus = false);
-
-typedef void (*BrowserChatUiTaskFn)(void* ctx);
-typedef void (*BrowserChatUiTaskRunner)(BrowserChatUiTaskFn fn, void* ctx);
-void SetBrowserChatUiTaskRunner(BrowserChatUiTaskRunner runner);
-void RunBrowserChatUiTask(BrowserChatUiTaskFn fn, void* ctx);
-
-enum class AiChatService {
-    Doubao,
-    DeepSeek,
-    ChatGPT,
-};
-
-bool LaunchAiChatBrowser(AiChatService service, bool* reusedOut = nullptr, HWND* browserHwndOut = nullptr,
-                         bool* navigatedOut = nullptr);
-bool PasteAndSubmitAiChatWhenReady(AiChatService service, HWND browserHwnd, bool waitForPageReady,
-                                   bool dismissChromeFocus = false);
-// Cold / blank chat: send "hi!", wait until the page looks like a live conversation,
-// then return so the real TOC payload can be pasted into a stable composer.
-bool EnsureAiChatComposerReady(AiChatService service, HWND browserHwnd, bool forceColdBootstrap);
-// Pastes each image into the user-visible web AI page without submitting text.
-// Success means paste was attempted, not a server-side upload acknowledgement.
-bool PasteAiChatFilesWhenReady(AiChatService service, HWND browserHwnd, bool waitForPageReady, const StrVec& paths);
-// After a chat message is submitted, wait until the tab title changes (the
-// model started a reply) and at least minWaitMs has elapsed, or until
-// timeoutMs. Always returns true so the next paste can still be attempted.
-bool WaitForAiChatTurn(HWND browserHwnd, int timeoutMs, int minWaitMs = 6000);
-// Preserve all files and the prompt for manual paste. Websites choose which
-// clipboard formats they accept; a single image additionally has a DIB format.
-bool CopyAiChatPayloadToClipboard(const StrVec& paths, const char* prompt);
-void LaunchAiChatWithPromptAsync(AiChatService service, const char* prompt);
 void OpenPathInDefaultFileManager(const char* path);
 void PaintCheckerboard(HDC hdc, int x, int y, int w, int h);
 

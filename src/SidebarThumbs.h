@@ -9,8 +9,7 @@ enum class SidebarView {
     Bookmarks = 0,
     Thumbnails = 1,
     Favorites = 2,
-    Ai = 3,
-    Annotations = 4,
+    Annotations = 3,
 };
 
 SidebarView SidebarViewFromStr(const char* s);

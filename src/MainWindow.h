@@ -181,11 +181,8 @@ struct MainWindow {
 
     LabelWithCloseWnd* tocLabelWithClose = nullptr;
     HWND hwndSidebarThumbs = nullptr;
-    HWND hwndAiSidebar = nullptr;
-    // Last non-AI sidebar width, and the AI page width. AI width is runtime only.
+    // Last non-AI sidebar width. AI width is runtime only.
     int plainSidebarDx = 0;
-    int aiSidebarDx = 0;
-    bool sidebarWidthIsAi = false;
     Edit* tocFilterEdit = nullptr;
     // Search text kept per sidebar view: 0 bookmarks, 1 thumbnails, 2 favorites.
     AutoFreeStr sidebarFindText[3];

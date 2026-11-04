@@ -497,9 +497,6 @@ static bool AllowCommand(const CommandPaletteBuildCtx& ctx, i32 cmdId) {
     if (!HasPermission(Perm::InternetAccess)) {
         remove |= IsCmdInMenuList(cmdId, removeIfNoInternetPerms);
     }
-    if (!gGlobalPrefs->enableAskAI && (cmdId == CmdAnalyzeSelectionWithDoubao || cmdId == CmdOpenAskAi)) {
-        remove = true;
-    }
     if (!HasPermission(Perm::FullscreenAccess)) {
         remove |= IsCmdInMenuList(cmdId, removeIfNoFullscreenPerms);
     }

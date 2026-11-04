@@ -569,7 +569,7 @@ COLORREF ThemeDocumentColors(COLORREF& bg) {
         bg = ThemeMainWindowBackgroundColor();
         if (ThemeUsesDarkChrome()) {
             // Dark-Black: subtle near-black workspace (#0D0D0D) matching the
-            // ChatGPT-style dark UI; Dracula keeps AccentColor(bg, 8) which
+            // dark chat-style UI; Dracula keeps AccentColor(bg, 8) which
             // produces the existing #2F313F sidebar / canvas hierarchy.
             int delta = (GetResolvedThemeIndex() == kThemeIdxDarkBlack) ? 13 : 8;
             bg = AccentColor(bg, delta);
@@ -789,7 +789,7 @@ COLORREF ThemeReadingTextColor() {
         return ThemeWindowTextColor();
     }
     // Dark-Black uses a neutral gray-white (#ECECEC) to match the
-    // ChatGPT-style near-black UI without the warm tint of kColReadingText.
+    // near-black UI without the warm tint of kColReadingText.
     // Dracula keeps the warm off-white (#E6E1D8) for its existing palette.
     if (ThemeUsesBlackChrome()) {
         return RGB(0xEC, 0xEC, 0xEC);

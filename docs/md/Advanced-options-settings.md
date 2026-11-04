@@ -159,41 +159,6 @@ OcrCopyMerged = true
 ; Valid values: conservative, standard, detailed (introduced in version 3.8)
 ExtractPdfTocMode = standard
 
-; Valid values: doubao, deepseek, chatgpt (introduced in version 3.7)
-AiChatProvider = doubao
-
-; AI table of contents API base URL
-AiTocApiBaseUrl = 
-
-; AI table of contents API key
-AiTocApiKey = 
-
-; AI table of contents model
-AiTocApiModel = 
-
-; saved AI table of contents API profiles (JSON)
-AiTocApiProfiles = 
-
-; default chat API profile; -1 inherits the general AI API
-AiChatApiProfile = -1
-
-; default chat model; empty inherits the selected API model
-AiChatModel =
-
-; maximum simultaneous AI table of contents requests (1-8)
-AiTocApiConcurrency = 4
-
-; last chosen body TOC AI method: api/web; empty asks on first use
-AiTocBodyProvider =
-
-; deprecated: use AiChatProvider instead; if true and AiChatProvider is not in
-; settings, migrates to deepseek (introduced in version 3.7)
-AiChatUseDeepSeekInsteadOfDoubao = false
-
-; if false, hide Ask AI (online chat) in the selection toolbar, context menu,
-; and command palette (introduced in version 3.7)
-EnableAskAI = true
-
 ; if false, hide Translate in the selection toolbar, context menu, and command
 ; palette (introduced in version 3.7)
 EnableInlineTranslate = true
@@ -516,8 +481,8 @@ Annotations [
     ; all. If not set will use Windows user name (introduced in version 3.4)
     DefaultAuthor = 
 
-    ; if true, a small toolbar with annotation actions (highlight, underline
-    ; etc.) and Ask AI pops up after selecting text in PDF documents that
+    ; if true, a small toolbar with annotation actions (highlight, underline,
+    ; translate etc.) pops up after selecting text in PDF documents that
     ; support annotations. Set to false to disable it (introduced in version
     ; 3.7)
     SelectionToolbar = true

@@ -93,7 +93,6 @@ WindowTab::~WindowTab() {
         ReadAloudHighlightFree(readAloudHighlight);
         delete readAloudHighlight;
     }
-    FreeTabAskAiState(this);
     FreeTabState(tabState);
     ClearPdfDeletedAnnotCovers(this);
 }

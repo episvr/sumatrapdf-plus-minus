@@ -1607,7 +1607,7 @@ struct PdfRotatePagesDialog {
     HWND hwndCancelBtn = nullptr;
     HFONT hFont = nullptr;
     HFONT hFontBold = nullptr;
-    // theme-adaptive painting (all four themes), mirrors AiTocDialog
+    // theme-adaptive painting (all four themes), mirrors the printed-TOC dialog
     HBRUSH bgBrush = nullptr;   // ThemeWindowBackgroundColor
     HBRUSH ctrlBrush = nullptr; // ThemeWindowControlBackgroundColor
     MainWindow* win = nullptr;

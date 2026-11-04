@@ -166,7 +166,7 @@ static void FontComboThemeListScrollbar(HWND combo) {
     if (!GetComboBoxInfo(combo, &info) || !info.hwndList) {
         return;
     }
-    // Reuse AppDialogThemeScrollBar (Ask AI / InlineTranslate scrollbar-only).
+    // Reuse AppDialogThemeScrollBar (InlineTranslate scrollbar-only).
     if (DynSetWindowTheme) {
         DynSetWindowTheme(info.hwndList, L" ", L" ");
     }
@@ -1094,7 +1094,7 @@ static void FontPickerApplyControlTheme(FontPickerWnd* p) {
         return;
     }
     // The list is our own class, so setDarkWndSafe never themes its bar.
-    // Ask AI recolors only the scrollbar class and leaves the rest alone.
+    // The translate popup recolors only the scrollbar class and leaves the rest alone.
     if (UseDarkModeLib() && ThemeUsesDarkChrome() && DarkMode::isExperimentalActive()) {
         if (DynSetWindowTheme) {
             DynSetWindowTheme(p->hwndList, nullptr, L"DarkMode_Explorer::ScrollBar");

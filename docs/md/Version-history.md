@@ -2,6 +2,9 @@
 
 ## next
 
+- 本分支已移除全部 AI 功能（AI 目录识别、Ask AI 侧栏/浮层、浏览器 AI 聊天、网页 AI 翻译回退及相应设置、命令、菜单、文档与翻译）。保留本地 OCR、印刷目录提取与校准，以及基于火山引擎密钥的划词翻译。
+  This branch removes all AI features (AI table-of-contents recognition, the Ask AI sidebar/popup, browser AI chat, web AI translation fallback, and the related settings, commands, menus, docs, and translations). Local OCR, printed-TOC extraction and calibration, and Volcengine-keyed selection translate are kept. Entries below from earlier versions may still mention these features.
+
 ## 3.7.87 (2026-10-31)
 
 - 修复中文搜索的 Unicode 空白判断，支持全角空格等字间空白，避免部分汉字误判为空白；纯中文查询禁用大小写和全词匹配，并忽略之前保留的全词匹配状态。

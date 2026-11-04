@@ -23,10 +23,10 @@ RoughLang DetectSourceLangRough(const char* text);
 // Maps Sumatra UI lang codes (cn, tw, kr, vn, ...) to Volc/translate codes (zh, en, ko, ...).
 const char* UiLangToTranslateCode(const char* uiLangCode);
 
-// Human-readable English name for LLM prompts / diagnostics.
+// Human-readable English name for diagnostics.
 const char* TranslateCodeDisplayName(const char* code);
 
-// Resolves the translate target code for Volc/LLM.
+// Resolves the translate target code for Volc.
 // targetMode: "auto" | "ui" | language code (zh, en, ja, ...).
 const char* ResolveTranslateTarget(const char* text, const char* targetMode, const char* uiLangCode);
 
