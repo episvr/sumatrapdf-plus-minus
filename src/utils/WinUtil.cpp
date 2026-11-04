@@ -1133,7 +1133,7 @@ static bool BrowserWindowTitleMatchesHost(HWND hwnd, const char* host) {
     return str::FindI(ToUtf8Temp(title), host) != nullptr;
 }
 
-static bool BrowserWindowMatchesService(HWND hwnd, const char* reuseKey, const char* host) {
+static bool BrowserWindowMatchesService(HWND hwnd, const char* host) {
     if (BrowserWindowTitleMatchesHost(hwnd, host)) {
         return true;
     }
@@ -1141,7 +1141,6 @@ static bool BrowserWindowMatchesService(HWND hwnd, const char* reuseKey, const c
 }
 
 struct FindBrowserByServiceCtx {
-    const char* reuseKey = nullptr;
     const char* host = nullptr;
     HWND hwnd = nullptr;
 };
@@ -1151,15 +1150,15 @@ static BOOL CALLBACK FindBrowserByServiceEnumProc(HWND hwnd, LPARAM lParam) {
     if (!IsBrowserTopLevelWindow(hwnd)) {
         return TRUE;
     }
-    if (BrowserWindowMatchesService(hwnd, ctx->reuseKey, ctx->host)) {
+    if (BrowserWindowMatchesService(hwnd, ctx->host)) {
         ctx->hwnd = hwnd;
         return FALSE;
     }
     return TRUE;
 }
 
-static HWND FindBrowserWindowForService(const char* reuseKey, const char* host) {
-    FindBrowserByServiceCtx ctx{reuseKey, host, nullptr};
+static HWND FindBrowserWindowForService(const char* host) {
+    FindBrowserByServiceCtx ctx{host, nullptr};
     EnumWindows(FindBrowserByServiceEnumProc, (LPARAM)&ctx);
     return ctx.hwnd;
 }
@@ -1294,6 +1293,20 @@ static bool BrowserTitleLooksLikeInactiveChat(const char* titleA) {
 }
 
 // Active tab is another site in a browser window we previously used.
+static HWND PollForBrowserWindowAfterLaunch(const char* host, int timeoutMs) {
+    int elapsed = 0;
+    const int interval = 100;
+    while (elapsed <= timeoutMs) {
+        HWND hwnd = FindBrowserWindowForService(host);
+        if (hwnd) {
+            return hwnd;
+        }
+        Sleep(interval);
+        elapsed += interval;
+    }
+    return nullptr;
+}
+
 bool LaunchBrowserWithReuse(const char* url, bool navigateOnReuse, bool* reusedOut, HWND* browserHwndOut,
                             bool* navigatedOut) {
     if (reusedOut) {
@@ -1311,7 +1324,7 @@ bool LaunchBrowserWithReuse(const char* url, bool navigateOnReuse, bool* reusedO
 
     TempStr reuseKey = BrowserReuseKeyFromUrlTemp(url);
     TempStr host = HostFromUrlTemp(url);
-    HWND hwnd = FindBrowserWindowForService(reuseKey, host);
+    HWND hwnd = FindBrowserWindowForService(host);
     HWND storedHwnd = nullptr;
     if (!hwnd) {
         storedHwnd = FindStoredBrowserHwnd(reuseKey);
@@ -1322,7 +1335,7 @@ bool LaunchBrowserWithReuse(const char* url, bool navigateOnReuse, bool* reusedO
         GetWindowTextW(hwnd, titleW, dimof(titleW));
         TempStr titleA = ToUtf8Temp(titleW);
         bool onChatPage =
-            BrowserWindowMatchesService(hwnd, reuseKey, host) && !BrowserTitleLooksLikeInactiveChat(titleA);
+            BrowserWindowMatchesService(hwnd, host) && !BrowserTitleLooksLikeInactiveChat(titleA);
         bool ok = false;
         bool reused = false;
         if (onChatPage && !navigateOnReuse) {
@@ -1354,7 +1367,7 @@ bool LaunchBrowserWithReuse(const char* url, bool navigateOnReuse, bool* reusedO
         return false;
     }
 
-    hwnd = PollForBrowserWindowAfterLaunch(reuseKey, host, 30000);
+    hwnd = PollForBrowserWindowAfterLaunch(host, 30000);
     if (!hwnd) {
         return false;
     }
